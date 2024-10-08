@@ -1,5 +1,5 @@
+from wrs import rm
 import math
-import numpy as np
 import wrs.robot_sim.robots.single_arm_robot_interface as sari
 import wrs.robot_sim.manipulators.rs007l.rs007l as manipulator
 import wrs.robot_sim.end_effectors.grippers.or2fg7.or2fg7 as end_effector
@@ -8,8 +8,8 @@ import wrs.robot_sim.end_effectors.grippers.or2fg7.or2fg7 as end_effector
 class KHI_OR2FG7(sari.SglArmRobotInterface):
 
     def __init__(self,
-                 pos=np.zeros(3),
-                 rotmat=np.eye(3),
+                 pos=rm.np.zeros(3),
+                 rotmat=rm.np.eye(3),
                  name="khi_or2fg7",
                  enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name, enable_cc=enable_cc)
@@ -67,13 +67,13 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[2, 2, 3], lookat_pos=[0, 0, .5])
 
     mgm.gen_frame().attach_to(base)
-    robot = KHI_OR2FG7(pos=np.array([0,0,0.2]), enable_cc=True)
+    robot = KHI_OR2FG7(pos=rm.np.array([0,0,0.2]), enable_cc=True)
     robot.change_jaw_width(.02)
     # robot.gen_meshmodel(toggle_tcp_frame=True, toggle_jnt_frames=True).attach_to(base)
     # robot_s.gen_meshmodel(toggle_flange_frame=False, toggle_jnt_frames=False).attach_to(base)
     # robot.gen_stickmodel(toggle_tcp_frame=True, toggle_jnt_frames=True).attach_to(base)
     # base.run()
-    tgt_pos = np.array([.25, .2, .15])
+    tgt_pos = rm.np.array([.25, .2, .15])
     tgt_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi * 2 / 3)
     mgm.gen_frame(pos=tgt_pos, rotmat=tgt_rotmat, ax_length=1).attach_to(base)
     # base.run()

@@ -1,10 +1,7 @@
-import math
-import numpy as np
+from wrs import rm, mcm
 import wrs.robot_sim._kinematics.jl as rkjl
-import wrs.modeling.collision_model as mcm
 import wrs.robot_sim.robots.single_arm_robot_interface as sari
 import wrs.robot_sim.manipulators.rs007l.rs007l as manipulator
-
 
 class KHI_BLQC(sari.SglArmRobotInterface):
     """
@@ -12,7 +9,7 @@ class KHI_BLQC(sari.SglArmRobotInterface):
     date: 20230826toyonaka
     """
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name="khi_g", enable_cc=True):
+    def __init__(self, pos=rm.np.zeros(3), rotmat=rm.np.eye(3), name="khi_g", enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name, enable_cc=enable_cc)
         # arm
         self.manipulator = manipulator.RS007L(pos=pos,
@@ -21,7 +18,7 @@ class KHI_BLQC(sari.SglArmRobotInterface):
         # tool changer
         self.tool_changer = rkjl.Anchor(name=name + '_tool_changer', pos=self.manipulator.gl_flange_pos,
                                         rotmat=self.manipulator.gl_flange_rotmat, n_flange=1)
-        self.tool_changer.loc_flange_pose_list[0][0] = np.array([0, 0, .0315])
+        self.tool_changer.loc_flange_pose_list[0][0] = rm.np.array([0, 0, .0315])
         self.tool_changer.lnk_list[0].cmodel = mcm.gen_stick(self.tool_changer.pos,
                                                              # TODO: change to combined model, 20230806
                                                              self.tool_changer.gl_flange_pose_list[0][0],
@@ -125,11 +122,11 @@ if __name__ == '__main__':
 
     rrtc_planner = rrtc.RRTConnect(robot)
 
-    ee_g_pos = np.array([-.4, .4, .19])
-    ee_g_rotmat = rm.rotmat_from_euler(0, np.radians(180), 0)
+    ee_g_pos = rm.np.array([-.4, .4, .19])
+    ee_g_rotmat = rm.rotmat_from_euler(0, rm.np.radians(180), 0)
     ee_g = org.OR2FG7(pos=ee_g_pos,
                       rotmat=ee_g_rotmat,
-                      coupling_offset_pos=np.array([0, 0, 0.0314]))
+                      coupling_offset_pos=rm.np.array([0, 0, 0.0314]))
     ee_g_meshmodel = ee_g.gen_meshmodel(toggle_jnt_frames=True, toggle_tcp_frame=True)
     ee_g_meshmodel.attach_to(base)
     jv_attach_eeg = robot.ik(ee_g_pos, ee_g_rotmat)
@@ -137,11 +134,11 @@ if __name__ == '__main__':
     robot.gen_meshmodel().attach_to(base)
     print(jv_attach_eeg)
 
-    ee_sd_pos = np.array([-.4, .6, .19])
-    ee_sd_rotmat = rm.rotmat_from_euler(0, np.radians(180), np.radians(180))
+    ee_sd_pos = rm.np.array([-.4, .6, .19])
+    ee_sd_rotmat = rm.rotmat_from_euler(0, rm.np.radians(180), rm.np.radians(180))
     ee_sd = ors.ORSD(pos=ee_sd_pos,
                      rotmat=ee_sd_rotmat,
-                     coupling_offset_pos=np.array([0, 0, 0.0314]))
+                     coupling_offset_pos=rm.np.array([0, 0, 0.0314]))
     ee_sd_meshmodel = ee_sd.gen_meshmodel(toggle_jnt_frames=True, toggle_tcp_frame=True)
     ee_sd_meshmodel.attach_to(base)
     jv_attach_eesd = robot.ik(ee_sd_pos, ee_sd_rotmat)
@@ -149,8 +146,8 @@ if __name__ == '__main__':
     robot.gen_meshmodel().attach_to(base)
     print(jv_attach_eesd)
 
-    goal_pos = np.array([.3, -.5, .19])
-    goal_rotmat = rm.rotmat_from_euler(0, np.radians(90), 0)
+    goal_pos = rm.np.array([.3, -.5, .19])
+    goal_rotmat = rm.rotmat_from_euler(0, rm.np.radians(90), 0)
     jv_goal = robot.ik(tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
     robot.goto_given_conf(jv_goal)
     robot.gen_meshmodel().attach_to(base)
@@ -206,18 +203,18 @@ if __name__ == '__main__':
     robot_s = KHI_BLQC(enable_cc=True)
     robot_s.gen_meshmodel(toggle_tcp_frame=True, toggle_jnt_frames=True).attach_to(base)
 
-    ee_g_pos = np.array([0, .8, .19])
-    ee_g_rotmat = rm.rotmat_from_euler(0, np.radians(180), 0)
+    ee_g_pos = rm.np.array([0, .8, .19])
+    ee_g_rotmat = rm.rotmat_from_euler(0, rm.np.radians(180), 0)
     ee_g = org.OR2FG7(pos=ee_g_pos,
                       rotmat=ee_g_rotmat,
-                      coupling_offset_pos=np.array([0, 0, 0.0314]), enable_cc=True)
+                      coupling_offset_pos=rm.np.array([0, 0, 0.0314]), enable_cc=True)
     ee_g.gen_meshmodel().attach_to(base)
 
-    ee_sd_pos = np.array([.15, .8, .19])
-    ee_sd_rotmat = rm.rotmat_from_euler(0, np.radians(180), np.radians(-90))
+    ee_sd_pos = rm.np.array([.15, .8, .19])
+    ee_sd_rotmat = rm.rotmat_from_euler(0, rm.np.radians(180), rm.np.radians(-90))
     ee_sd = ors.ORSD(pos=ee_sd_pos,
                      rotmat=ee_sd_rotmat,
-                     coupling_offset_pos=np.array([0, 0, 0.0314]))
+                     coupling_offset_pos=rm.np.array([0, 0, 0.0314]))
     ee_sd.gen_meshmodel().attach_to(base)
 
     jnt_values = robot_s.ik(ee_g_pos, ee_g_rotmat)
@@ -226,15 +223,15 @@ if __name__ == '__main__':
     robot_s_meshmodel.attach_to(base)
 
     robot_s.attach_tool(ee_g)
-    goal_pos = np.array([.3, -.8, .19])
-    goal_rotmat = rm.rotmat_from_euler(0, np.radians(90), 0)
+    goal_pos = rm.np.array([.3, -.8, .19])
+    goal_rotmat = rm.rotmat_from_euler(0, rm.np.radians(90), 0)
     jnt_values = robot_s.ik(tgt_pos=goal_pos, tgt_rotmat=goal_rotmat)
     robot_s.fk(jnt_values=jnt_values)
     robot_s_meshmodel = robot_s.gen_meshmodel(toggle_tcp_frame=True)
     robot_s_meshmodel.attach_to(base)
     base.run()
 
-    tgt_pos = np.array([.45, .2, .35])
+    tgt_pos = rm.np.array([.45, .2, .35])
     tgt_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi * 2 / 3)
     gm.gen_frame(pos=tgt_pos, rotmat=tgt_rotmat).attach_to(base)
     # base.run()

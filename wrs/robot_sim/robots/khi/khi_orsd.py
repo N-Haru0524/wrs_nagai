@@ -1,13 +1,12 @@
+from wrs import rm
 import math
-import numpy as np
 import wrs.robot_sim.robots.single_arm_robot_interface as sari
 import wrs.robot_sim.manipulators.rs007l.rs007l as manipulator
 import wrs.robot_sim.end_effectors.single_contact.screw_driver.orsd.orsd as end_effector
 
-
 class KHI_ORSD(sari.SglArmRobotInterface):
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name="khi_g", enable_cc=True):
+    def __init__(self, pos=rm.np.zeros(3), rotmat=rm.np.eye(3), name="khi_g", enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name, enable_cc=enable_cc)
         # arm
         self.manipulator = manipulator.RS007L(pos=pos,
@@ -16,7 +15,7 @@ class KHI_ORSD(sari.SglArmRobotInterface):
         # grippers
         self.end_effector = end_effector.ORSD(pos=self.manipulator.gl_flange_pos,
                                               rotmat=self.manipulator.gl_flange_rotmat,
-                                              coupling_offset_pos=np.array([0, 0, 0.0639]),
+                                              coupling_offset_pos=rm.np.array([0, 0, 0.0639]),
                                               name='orsd')
         # tool center point
         self.manipulator.jlc._loc_flange_pos = self.end_effector.loc_acting_center_pos
@@ -61,7 +60,7 @@ if __name__ == '__main__':
     # robot_s.gen_meshmodel(toggle_flange_frame=False, toggle_jnt_frames=False).attach_to(base)
     robot_s.gen_stickmodel(toggle_tcp_frame=True, toggle_jnt_frames=True).attach_to(base)
     base.run()
-    tgt_pos = np.array([.25, .2, .15])
+    tgt_pos = rm.np.array([.25, .2, .15])
     tgt_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi * 2 / 3)
     mgm.gen_frame(pos=tgt_pos, rotmat=tgt_rotmat).attach_to(base)
     # base.run()

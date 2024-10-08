@@ -2,6 +2,7 @@
 from .basis import robot_math as rm
 from .modeling import collision_model as mcm
 from .modeling import geometric_model as mgm
+from .modeling import model_collection as mmc
 from .visualization.panda import world as wd
 
 # robots
@@ -26,14 +27,15 @@ from .motion.probabilistic import rrt_connect as rrtc
 from .motion.primitives import interpolated as mip
 from .manipulation import pick_place_planner as ppp
 from .motion.trajectory import topp_ra as toppra
+from .motion import motion_data as mmd
 
 # manipulation
 from .manipulation.placement import flat_surface_placement as fsp
 from .manipulation import regrasp as reg
 
-__all__ = ['rm', 'mcm', 'mgm', 'wd',
+__all__ = ['rm', 'mcm', 'mgm', 'mmc', 'wd',
            'cbt', 'x6wg2', 'ur3d', 'ur3ed', 'ko2fg', 'ym',
            'rtq85',
            'gg', 'gpa', 'gag',
-           'rrtc', 'mip', 'ppp', 'toppra',
+           'rrtc', 'mip', 'ppp', 'toppra', 'mmd',
            'fsp', 'reg']

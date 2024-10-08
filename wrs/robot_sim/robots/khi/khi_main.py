@@ -1,14 +1,9 @@
-import os
-import math
-import numpy as np
-import wrs.basis.robot_math as rm
-import wrs.modeling.collision_model as mcm
+from wrs import wd, mgm, mcm, rm, mmd, mmc
 import wrs.robot_sim.robots.robot_interface as ri
-import wrs.modeling.model_collection as mmc
 import wrs.robot_sim._kinematics.jlchain as rkjlc
 import wrs.robot_sim.robots.khi.khi_or2fg7 as kg
 import wrs.robot_sim.robots.khi.khi_orsd as ksd
-
+import os
 
 class KHI_DUAL(ri.RobotInterface):
     """
@@ -16,15 +11,15 @@ class KHI_DUAL(ri.RobotInterface):
     date: 20230805 Toyonaka
     """
 
-    def __init__(self, pos=np.zeros(3), rotmat=np.eye(3), name='khi_dual', enable_cc=True):
+    def __init__(self, pos=rm.np.zeros(3), rotmat=rm.np.eye(3), name='khi_dual', enable_cc=True):
         super().__init__(pos=pos, rotmat=rotmat, name=name, enable_cc=enable_cc)
         current_file_dir = os.path.dirname(__file__)
-        lft_arm_homeconf = np.radians(np.array([0, 0, 0, 0, 0, 0]))
-        rgt_arm_homeconf = np.radians(np.array([0, 0, 0, 0, 0, 0]))
+        lft_arm_homeconf = rm.np.radians(rm.np.array([0, 0, 0, 0, 0, 0]))
+        rgt_arm_homeconf = rm.np.radians(rm.np.array([0, 0, 0, 0, 0, 0]))
         # the body anchor
         self.body = rkjlc.rkjl.Anchor(name="khi_dual_base", pos=self.pos, rotmat=self.rotmat, n_flange=2, n_lnk=1)
-        self.body.loc_flange_pose_list[0] = [np.array([0, .4, .726]), rm.rotmat_from_euler(0, 0, -np.pi / 2)]
-        self.body.loc_flange_pose_list[1] = [np.array([0, -.4, .726]), rm.rotmat_from_euler(0, 0, -np.pi / 2)]
+        self.body.loc_flange_pose_list[0] = [rm.np.array([0, .4, .726]), rm.rotmat_from_euler(0, 0, -rm.np.pi / 2)]
+        self.body.loc_flange_pose_list[1] = [rm.np.array([0, -.4, .726]), rm.rotmat_from_euler(0, 0, -rm.np.pi / 2)]
         self.body.lnk_list[0].cmodel = mcm.CollisionModel(
             os.path.join(current_file_dir, "meshes", "base_table.stl"))
         # lft
@@ -150,7 +145,7 @@ class KHI_DUAL(ri.RobotInterface):
 
     def get_jnt_values(self):
         if self.delegator is None:
-            return np.concatenate((self.lft_arm.get_jnt_values(), self.rgt_arm.get_jnt_values()))
+            return rm.np.concatenate((self.lft_arm.get_jnt_values(), self.rgt_arm.get_jnt_values()))
         else:
             return self.delegator.get_jnt_values()
 
@@ -161,7 +156,7 @@ class KHI_DUAL(ri.RobotInterface):
         date: 20210406
         """
         if self.delegator is None:
-            return np.concatenate((self.lft_arm.rand_conf(), self.rgt_arm.rand_conf()))
+            return rm.np.concatenate((self.lft_arm.rand_conf(), self.rgt_arm.rand_conf()))
         else:
             return self.delegator.rand_conf()
 
@@ -242,8 +237,15 @@ class KHI_DUAL(ri.RobotInterface):
                                    toggle_cdmesh=toggle_cdmesh,
                                    name=name + "_rgt_arm").attach_to(m_col)
         return m_col
-
-
+    
+    def fk(self, jnt_values):
+        if self.delegator is self.lft_arm:
+            return self.lft_arm.fk(jnt_values=jnt_values)
+        elif self.delegator is self.rgt_arm:
+            return self.rgt_arm.fk(jnt_values=jnt_values)
+        else:
+            raise ValueError("Please specify which arm to fk")
+    
 if __name__ == '__main__':
     import time
     import wrs.visualization.panda.world as wd
@@ -255,13 +257,13 @@ if __name__ == '__main__':
     khibt.attach_to(base)
     base.run()
 
-    # tgt_pos = np.array([.4, 0, .2])
+    # tgt_pos = rm.np.array([.4, 0, .2])
     # tgt_rotmat = rm.rotmat_from_euler(0, math.pi * 2 / 3, -math.pi / 4)
     # ik test
     component_name = 'lft_arm_waist'
-    tgt_pos = np.array([-.3, .45, .55])
-    tgt_rotmat = rm.rotmat_from_axangle([0, 0, 1], -math.pi / 2)
-    # tgt_rotmat = np.eye(3)
+    tgt_pos = rm.np.array([-.3, .45, .55])
+    tgt_rotmat = rm.rotmat_from_axangle([0, 0, 1], -rm.np.pi / 2)
+    # tgt_rotmat = rm.np.eye(3)
     mcm.mgm.gen_frame(pos=tgt_pos, rotmat=tgt_rotmat).attach_to(base)
     tic = time.time()
     jnt_values = nxt_instance.ik(component_name, tgt_pos, tgt_rotmat, toggle_dbg=True)
@@ -279,8 +281,8 @@ if __name__ == '__main__':
 
     # hold test
     component_name = 'lft_arm'
-    obj_pos = np.array([-.1, .3, .3])
-    obj_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi / 2)
+    obj_pos = rm.np.array([-.1, .3, .3])
+    obj_rotmat = rm.rotmat_from_axangle([0, 1, 0], rm.np.pi / 2)
     objfile = os.path.join(basis.__path__[0], 'objects', 'tubebig.stl')
     objcm = mcm.CollisionModel(objfile, cdprim_type='cylinder')
     objcm.set_pos(obj_pos)
@@ -288,7 +290,7 @@ if __name__ == '__main__':
     objcm.attach_to(base)
     objcm_copy = objcm.copy()
     nxt_instance.hold(objcm=objcm_copy, jaw_width=0.03, hnd_name='lft_hnd')
-    tgt_pos = np.array([.4, .5, .4])
+    tgt_pos = rm.np.array([.4, .5, .4])
     tgt_rotmat = rm.rotmat_from_axangle([0, 1, 0], math.pi / 3)
     jnt_values = nxt_instance.ik(component_name, tgt_pos, tgt_rotmat)
     nxt_instance.fk(component_name, jnt_values)
