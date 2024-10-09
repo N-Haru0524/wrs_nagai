@@ -1,7 +1,7 @@
 from wrs import wd, rm, rrtc, mcm, mgm, gg, ppp, rrtc
 import wrs.robot_sim.robots.khi.khi_main as khi_dual
 import wrs.modeling.constant as const
-import wrs.robot_sim.robots.khi as khi
+import nagai as khi
 import os
 import pickle
 
@@ -26,7 +26,7 @@ bracketR1.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
 
 # object holder goal
 bracketR1_gl = mcm.CollisionModel(os.path.join(meshpath,"bracketR1.stl") ,alpha=.3)
-bracketR1_gl.pos = workbench.pos + home_pos + rm.np.array([0.03,.02,-0.02])
+bracketR1_gl.pos = workbench.pos + home_pos #+ rm.np.array([0.03,.02,-0.02])
 bracketR1_gl.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
 
 # copy to view original object

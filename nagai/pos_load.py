@@ -1,6 +1,6 @@
 from wrs import wd, rm, mcm, mgm
-from wrs.robot_sim.robots.khi.khi_main import KHI_DUAL
-from wrs.robot_sim.robots.khi import meshes as mesh
+import nagai as khi
+import yaml
 import os
 
 if __name__ == '__main__':    
@@ -12,68 +12,71 @@ if __name__ == '__main__':
     base = wd.World(cam_pos=[.5,.5,.5], lookat_pos=[0, 0, 0])
     mgm.gen_frame(ax_length=.15).attach_to(base)
 
-    khibt = KHI_DUAL()
-    # khibt.gen_meshmodel().attach_to(base)
-
     # load objects
+    with open(os.path.join(khi.__path__[0], "object.yaml")) as f:
+        objects = yaml.safe_load(f)
+
     # workbench
-    workbench_file = os.path.join(mesh.__path__[0], "workbench.stl")
+    workbench_file = os.path.join(khi.__path__[0], "meshes", objects['object1']['name'] + ".stl")
     workbench_cm = mcm.CollisionModel(initor=workbench_file,rgb=rm.const.orange_red)
-    workbench_cm.pos = rm.np.array([0,0,0])
-    workbench_cm.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
+    workbench_cm.pos = rm.np.array(objects['object1']['pos']) #+ rm.np.array([1,1,1])
+    workbench_cm.rotmat = rm.np.dot(rm.np.array(objects['object1']['rotmat']), rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz'))
     workbench_cm.attach_to(base)
 
+    rot_o2h = workbench_cm.rotmat
+    pos_o2h = workbench_cm.pos
+
     # bracketR1
-    bracketR1_file = os.path.join(mesh.__path__[0], "bracketR1.stl")
+    bracketR1_file = os.path.join(khi.__path__[0], "meshes", objects['object2']['name'] + ".stl")
     bracketR1_cm = mcm.CollisionModel(initor=bracketR1_file,rgb=rm.const.gray)
-    bracketR1_cm.pos = rm.np.array([-0.09,0,0.022])
-    bracketR1_cm.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
+    bracketR1_cm.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object2']['pos'])) + pos_o2h
+    bracketR1_cm.rotmat = rm.np.dot(rot_o2h, rm.np.array(objects['object2']['rotmat']))
     bracketR1_cm.attach_to(base)
     
     # capacitor
-    capacitor_file = os.path.join(mesh.__path__[0], "capacitor.stl")
+    capacitor_file = os.path.join(khi.__path__[0], "meshes", objects['object3']['name'] + ".stl")
     capacitor_cm = mcm.CollisionModel(initor=capacitor_file,rgb=rm.const.blue)
-    capacitor_cm.pos = rm.np.array([0.02,0,0.046])
-    capacitor_cm.rotmat = rm.rotmat_from_euler(ai=0,aj=-rm.np.pi/2,ak=0,order='rxyz')
+    capacitor_cm.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object3']['pos'])) + pos_o2h
+    capacitor_cm.rotmat = rm.np.dot(rot_o2h, rm.np.array(objects['object3']['rotmat']))
     capacitor_cm.attach_to(base)
 
     # relay_205B
-    relay_205B_file = os.path.join(mesh.__path__[0], "relay_205B.stl")
+    relay_205B_file = os.path.join(khi.__path__[0], "meshes", objects['object4']['name'] + ".stl")
     relay_205B_cm = mcm.CollisionModel(initor=relay_205B_file,rgb=rm.const.black)
-    relay_205B_cm.pos = rm.np.array([0.091,-0.0225,-0.003])
-    relay_205B_cm.rotmat = rm.rotmat_from_euler(ai=rm.np.pi,aj=rm.np.pi/2,ak=0,order='rxyz')
+    relay_205B_cm.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object4']['pos'])) + pos_o2h
+    relay_205B_cm.rotmat = rm.np.dot(rot_o2h, rm.np.array(objects['object4']['rotmat']))
     relay_205B_cm.attach_to(base)
 
     # belt
-    belt_file = os.path.join(mesh.__path__[0], "belt.stl")
+    belt_file = os.path.join(khi.__path__[0], "meshes", objects['object5']['name'] + ".stl")
     belt_cm = mcm.CollisionModel(initor=belt_file,rgb=rm.const.deep_sky_blue)
-    belt_cm.pos = rm.np.array([-0.044,-0.027,0.05])
-    belt_cm.rotmat = rm.rotmat_from_euler(ai=rm.np.pi,aj=0,ak=0,order='rxyz')
+    belt_cm.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object5']['pos'])) + pos_o2h
+    belt_cm.rotmat = rm.np.dot(rot_o2h, rm.np.array(objects['object5']['rotmat']))
     belt_cm.attach_to(base)
 
     # terminal_block
-    terminal_block_file = os.path.join(mesh.__path__[0], "terminal_block.stl")
+    terminal_block_file = os.path.join(khi.__path__[0], "meshes", objects['object6']['name'] + ".stl")
     terminal_block_cm = mcm.CollisionModel(initor=terminal_block_file,rgb=rm.const.yellow)
-    terminal_block_cm.pos = rm.np.array([0.065,0,0.023])
-    terminal_block_cm.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=rm.np.pi/2,ak=0,order='rxyz')
+    terminal_block_cm.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object6']['pos'])) + pos_o2h
+    terminal_block_cm.rotmat = rm.np.dot(rot_o2h, rm.np.array(objects['object6']['rotmat']))
     terminal_block_cm.attach_to(base)
 
     #numpy print options
     rm.np.set_printoptions(precision=3,suppress=True)
-    
+
     #print rotmats and pos
     print("workbench rotmat is:\t pos is:")
-    print(workbench_cm.rotmat,workbench_cm.pos)
+    print(workbench_cm.rotmat, workbench_cm.pos)
     print("bracketR1 rotmat is:\t pos is:")
-    print(bracketR1_cm.rotmat,bracketR1_cm.pos)
+    print(bracketR1_cm.rotmat, bracketR1_cm.pos)
     print("capacitor rotmat is:\t pos is:")
-    print(capacitor_cm.rotmat,capacitor_cm.pos)
+    print(capacitor_cm.rotmat, capacitor_cm.pos)
     print("relay____ rotmat is:\t pos is:")
-    print(relay_205B_cm.rotmat,relay_205B_cm.pos)
+    print(relay_205B_cm.rotmat, relay_205B_cm.pos)
     print("belt_____ rotmat is:\t pos is:")
-    print(belt_cm.rotmat,belt_cm.pos)
+    print(belt_cm.rotmat, belt_cm.pos)
     print("terminal_ rotmat is:\t pos is:")
-    print(terminal_block_cm.rotmat,terminal_block_cm.pos)
+    print(terminal_block_cm.rotmat, terminal_block_cm.pos)
 
     # workbench collision check
     print("workbench collision check")

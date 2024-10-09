@@ -49,13 +49,13 @@ class PickPlacePlanner(adp.ADPlanner):
                 if jnt_values is not None:
                     self.robot.goto_given_conf(jnt_values=jnt_values, ee_values=grasp.ee_values)
                     if not self.robot.is_collided(obstacle_list=obstacle_list):
-                        print('hand collision ', self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list))
-                        toggle_dbg = False
-                        if goal_id == 1:
-                            print(previous_available_gids)
-                            if gid == 175:
-                                # self.robot.end_effector.gen_meshmodel(rgb=rm.const.magenta, alpha=.3).attach_to(base)
-                                toggle_dbg = True
+                        # print('hand collision ', self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list))
+                        # toggle_dbg = False
+                        # if goal_id == 1:
+                        #     print(previous_available_gids)
+                        #     if gid == 175:
+                        #         # self.robot.end_effector.gen_meshmodel(rgb=rm.const.magenta, alpha=.3).attach_to(base)
+                        #         toggle_dbg = True
                         if not self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list, toggle_dbg=toggle_dbg):
                             previous_available_gids.append(gid)
                             if toggle_dbg:
@@ -76,7 +76,7 @@ class PickPlacePlanner(adp.ADPlanner):
                         rbt_collided_grasps_num += 1
                         if toggle_dbg:
                             self.robot.end_effector.gen_meshmodel(rgb=rm.const.orange, alpha=.3).attach_to(base)
-                            # self.robot.gen_meshmodel(rgb=rm.const.orange, alpha=.3).attach_to(base)
+                            self.robot.gen_meshmodel(rgb=rm.const.orange, alpha=.3).attach_to(base)
                 else:  # ik failure
                     ik_failed_grasps_num += 1
                     if toggle_dbg:
@@ -94,7 +94,7 @@ class PickPlacePlanner(adp.ADPlanner):
                 print("------end_type------")
         if toggle_dbg:
             base.run()
-        base.run()
+        # base.run()
         return previous_available_gids
 
     @adp.mpi.InterplatedMotion.keep_states_decorator

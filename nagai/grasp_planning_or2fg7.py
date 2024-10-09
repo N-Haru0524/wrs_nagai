@@ -1,11 +1,11 @@
 from wrs import wd, gpa, mcm, rm
 import wrs.robot_sim.end_effectors.grippers.or2fg7.or2fg7 as end_effector
-import wrs.robot_sim.robots.khi as khi
+import nagai as khi
 import os
 
 base = wd.World(cam_pos=rm.np.array([.5, .5, .5]), lookat_pos=rm.np.array([0, 0, 0]))
 # mgm.gen_frame().attach_to(base)
-meshname = "workbench.stl"
+meshname = "terminal_block.stl"
 meshpath = os.path.join(khi.__path__[0], "meshes")
 savepath = os.path.join(khi.__path__[0], "pickles")
 
@@ -19,7 +19,7 @@ grasp_collection = gpa.plan_gripper_grasps(gripper,
                                            obj_cmodel,
                                            angle_between_contact_normals=rm.np.radians(180),
                                            rotation_interval=rm.np.radians(30),
-                                           max_samples=150,
+                                           max_samples=15,
                                            min_dist_between_sampled_contact_points=.001,
                                            contact_offset=.001,
                                            toggle_dbg=False)
