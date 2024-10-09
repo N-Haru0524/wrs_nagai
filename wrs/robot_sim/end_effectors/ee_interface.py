@@ -118,13 +118,30 @@ class EEInterface(object):
             if cdme.cmodel is not None:
                 is_collided, collision_points = cdme.cmodel.is_mcdwith(cmodel_list, True)
                 if is_collided:
-                    if toggle_dbg:
-                        mgm.GeometricModel(cdme.cmodel).attach_to(base)
-                        print(collision_points)
-                        for point in collision_points:
-                            mgm.gen_sphere(point, radius=.01).attach_to(base)
-                        print("mesh collided")
                     return True
+                if toggle_dbg:
+                    cmodel=mgm.GeometricModel(cdme.cmodel)
+                    print(i)
+                    if i==0:
+                        cmodel.rgb=rm.const.red
+                    elif i==1:
+                        cmodel.rgb=rm.const.green
+                    else:
+                        cmodel.rgb=rm.const.blue
+                    cmodel.attach_to(base)
+                    print(collision_points)
+                    for point in collision_points:
+                        mgm.gen_sphere(point, radius=.01).attach_to(base)
+                    if is_collided:
+                        print("mesh collided")
+                    else:
+                        print("mesh not collided")
+        if toggle_dbg:
+            for obstacle in cmodel_list:
+                obstacle.attach_to(base)
+                obstacle.rgb = rm.const.blue
+            base.run()
+                # return True
         return False
 
     def fix_to(self, pos, rotmat):

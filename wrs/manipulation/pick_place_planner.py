@@ -47,18 +47,31 @@ class PickPlacePlanner(adp.ADPlanner):
                 goal_jaw_center_rotmat = goal_rotmat.dot(grasp.ac_rotmat)
                 jnt_values = self.robot.ik(tgt_pos=goal_jaw_center_pos, tgt_rotmat=goal_jaw_center_rotmat)
                 if jnt_values is not None:
-                    self.robot.goto_given_conf(jnt_values=jnt_values)
+                    self.robot.goto_given_conf(jnt_values=jnt_values, ee_values=grasp.ee_values)
                     if not self.robot.is_collided(obstacle_list=obstacle_list):
-                        if not self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list):
+                        print('hand collision ', self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list))
+                        toggle_dbg = False
+                        if goal_id == 1:
+                            print(previous_available_gids)
+                            if gid == 175:
+                                # self.robot.end_effector.gen_meshmodel(rgb=rm.const.magenta, alpha=.3).attach_to(base)
+                                toggle_dbg = True
+                        if not self.robot.end_effector.is_mesh_collided(cmodel_list=obstacle_list, toggle_dbg=toggle_dbg):
                             previous_available_gids.append(gid)
                             if toggle_dbg:
-                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.green, alpha=1).attach_to(base)
+                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.green, alpha=.3).attach_to(base)
                                 self.robot.gen_meshmodel(rgb=rm.const.green, alpha=.3).attach_to(base)
                         else:  # ee collided
+                            print("ee collided!")
                             eef_collided_grasps_num += 1
                             if toggle_dbg:
-                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.yellow, alpha=.3).attach_to(base)
-                                # self.robot.gen_meshmodel(rgb=rm.const.yellow, alpha=.3).attach_to(base)
+                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.yellow, alpha=1).attach_to(base)
+                                if goal_id == 1:
+                                    for obstacle in obstacle_list:
+                                        obstacle.attach_to(base)
+                                        obstacle.rgb = rm.const.red
+                                    base.run()
+                                self.robot.gen_meshmodel(rgb=rm.const.yellow, alpha=.3).attach_to(base)
                     else:  # robot collided
                         rbt_collided_grasps_num += 1
                         if toggle_dbg:
@@ -81,6 +94,7 @@ class PickPlacePlanner(adp.ADPlanner):
                 print("------end_type------")
         if toggle_dbg:
             base.run()
+        base.run()
         return previous_available_gids
 
     @adp.mpi.InterplatedMotion.keep_states_decorator
@@ -305,7 +319,7 @@ if __name__ == '__main__':
 
     base = wd.World(cam_pos=[2, 0, 1.5], lookat_pos=[0, 0, .2])
     mgm.gen_frame().attach_to(base)
-    obj_cmodel = cm.CollisionModel(initor='tubebig.stl')
+    obj_cmodel = mcm.CollisionModel(initor='tubebig.stl')
     obj_cmodel.pos = np.array([.45, -.2, .2])
     obj_cmodel.rotmat = np.eye(3)
     obj_cmodel_copy = obj_cmodel.copy()
