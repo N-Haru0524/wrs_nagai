@@ -23,6 +23,7 @@ from .grasping.planning import antipodal as gpa  # planning
 from .grasping.annotation import gripping as gag  # annotation
 
 # motion
+from .motion import motion_data as mmd
 from .motion.probabilistic import rrt_connect as rrtc
 from .motion.primitives import interpolated as mip
 from .manipulation import pick_place_planner as ppp
@@ -31,7 +32,7 @@ from .motion import motion_data as mmd
 
 # manipulation
 from .manipulation.placement import flat_surface_placement as fsp
-from .manipulation import regrasp as reg
+from .manipulation import flat_surface_regrasp as fsreg
 
 __all__ = ['rm', 'mcm', 'mgm', 'mmc', 'wd',
            'cbt', 'x6wg2', 'ur3d', 'ur3ed', 'ko2fg', 'ym',

@@ -4,7 +4,7 @@ base = wd.World(cam_pos=[1.2, .7, 1], lookat_pos=[.0, 0, .15])
 mgm.gen_frame().attach_to(base)
 # ground
 ground = mcm.gen_box(xyz_lengths=rm.vec(5, 5, 1), rgb=rm.vec(.7, .7, .7), alpha=1)
-ground.pos = rm.np.array([0, 0, -.51])
+ground.pos = rm.np.array([0, 0, -.5])
 ground.attach_to(base)
 ground.show_cdprim()
 ## object holder
@@ -21,7 +21,7 @@ h1_copy.attach_to(base)
 h1_copy.show_cdprim()
 ## object holder goal
 holder_2 = mcm.CollisionModel("objects/holder.stl")
-h2_gl_pos = rm.np.array([.2, -.12, .02])
+h2_gl_pos = rm.np.array([.2, -.12, .0])
 h2_gl_rotmat = rm.rotmat_from_euler(0, 0, rm.pi / 3)
 holder_2.pos = h2_gl_pos
 holder_2.rotmat = h2_gl_rotmat
@@ -48,10 +48,10 @@ mot_data = ppp.gen_pick_and_place(obj_cmodel=holder_1,
                                   end_jnt_values=start_conf,
                                   grasp_collection=grasp_collection,
                                   goal_pose_list=goal_pose_list,
-                                  approach_distance_list=[.03] * len(goal_pose_list),
-                                  depart_distance_list=[.03] * len(goal_pose_list),
-                                  pick_approach_distance=.03,
-                                  pick_depart_distance=.03,
+                                  approach_distance_list=[.05] * len(goal_pose_list),
+                                  depart_distance_list=[.05] * len(goal_pose_list),
+                                  pick_approach_distance=.05,
+                                  pick_depart_distance=.05,
                                   pick_depart_direction=rm.const.z_ax,
                                   use_rrt=True)
 

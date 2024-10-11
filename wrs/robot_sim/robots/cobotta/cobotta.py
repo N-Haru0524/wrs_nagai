@@ -29,7 +29,7 @@ class Cobotta(sari.SglArmRobotInterface):
         el0 = self.cc.add_cce(self.end_effector.jlc.jnts[0].lnk)
         el1 = self.cc.add_cce(self.end_effector.jlc.jnts[1].lnk)
         # manipulator
-        mlb = self.cc.add_cce(self.manipulator.jlc.anchor.lnk_list[0])
+        mlb = self.cc.add_cce(self.manipulator.jlc.anchor.lnk_list[0], toggle_ext_collider=False)
         ml0 = self.cc.add_cce(self.manipulator.jlc.jnts[0].lnk)
         ml1 = self.cc.add_cce(self.manipulator.jlc.jnts[1].lnk)
         ml2 = self.cc.add_cce(self.manipulator.jlc.jnts[2].lnk)
@@ -40,6 +40,7 @@ class Cobotta(sari.SglArmRobotInterface):
         into_list = [mlb, ml0]
         self.cc.set_cdpair_by_ids(from_list, into_list)
         self.cc.dynamic_into_list = [mlb, ml0, ml1, ml2, ml3]
+        self.cc.dynamic_ext_list = [el0, el1]
 
     def fix_to(self, pos, rotmat):
         self._pos = pos

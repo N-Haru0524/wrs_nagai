@@ -36,8 +36,8 @@ class GraspReasoner(object):
         :return:
         """
         return gg.Grasp(ee_values=grasp.ee_values,
-                       ac_pos=goal_pos + goal_rotmat.dot(grasp.ac_pos),
-                       ac_rotmat=goal_rotmat.dot(grasp.ac_rotmat))
+                        ac_pos=goal_pos + goal_rotmat.dot(grasp.ac_pos),
+                        ac_rotmat=goal_rotmat.dot(grasp.ac_rotmat))
 
     ## The following code examines robot IK first. In contrast, the code blow this one examines EE collisions first.
     ## The code below this more is slight more efficient and is thus adopted.
@@ -156,7 +156,7 @@ class GraspReasoner(object):
                     # ee collided
                     eef_collided_grasps_num += 1
                     if toggle_dbg:
-                        self.robot.end_effector.gen_meshmodel(rgb=rm.const.white, alpha=1).attach_to(base)
+                        self.robot.end_effector.gen_meshmodel(rgb=rm.const.white, alpha=.3).attach_to(base)
                 else:
                     if consider_robot:
                         jnt_values = self.robot.ik(tgt_pos=goal_grasp.ac_pos, tgt_rotmat=goal_grasp.ac_rotmat)
@@ -167,7 +167,7 @@ class GraspReasoner(object):
                                 self.robot.end_effector.grip_at_by_pose(jaw_center_pos=goal_grasp.ac_pos,
                                                                         jaw_center_rotmat=goal_grasp.ac_rotmat,
                                                                         jaw_width=goal_grasp.ee_values)
-                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.magenta, alpha=1).attach_to(base)
+                                self.robot.end_effector.gen_meshmodel(rgb=rm.const.magenta, alpha=.3).attach_to(base)
                         else:
                             self.robot.goto_given_conf(jnt_values=jnt_values)
                             if not self.robot.is_collided(obstacle_list=obstacle_list):
@@ -179,7 +179,13 @@ class GraspReasoner(object):
                             else:  # robot collided
                                 rbt_collided_grasps_num += 1
                                 if toggle_dbg:
-                                    self.robot.gen_meshmodel(rgb=rm.const.orange, toggle_cdprim=True).attach_to(base)
+                                    self.robot.end_effector.gen_meshmodel(rgb=rm.const.orange, alpha=.3).attach_to(base)
+                                    self.robot.gen_meshmodel(rgb=rm.const.orange, alpha=.3).attach_to(base)
+                                    # _, points = self.robot.is_collided(obstacle_list=obstacle_list, toggle_contacts=True)
+                                    # from wrs import mgm
+                                    # for point in points:
+                                    #     mgm.gen_sphere(pos=point, radius=.001).attach_to(base)
+                                    # base.run()
                     else:
                         ik_failed_grasps_num = '-'
                         rbt_collided_grasps_num = '-'

@@ -19,6 +19,7 @@ class InterplatedMotion(object):
         self.robot = robot
         # define data type
         self.toggle_keep = True
+        self.toggle_off_eecd = True
 
     @staticmethod
     def keep_states_decorator(method):
@@ -41,7 +42,29 @@ class InterplatedMotion(object):
 
         return wrapper
 
+    @staticmethod
+    def keep_eecd_decorator(method):
+        """
+        decorator function for save and restore robot states
+        :return:
+        author: weiwei
+        date: 20220404
+        """
+
+        def wrapper(self, *args, **kwargs):
+            if getattr(self, "toggle_off_eecd", True):
+                self.robot.toggle_off_eecd()
+                result = method(self, *args, **kwargs)
+                self.robot.toggle_on_eecd()
+                return result
+            else:
+                result = method(self, *args, **kwargs)
+                return result
+
+        return wrapper
+
     @keep_states_decorator
+    @keep_eecd_decorator
     def gen_linear_motion(self,
                           start_tcp_pos,
                           start_tcp_rotmat,
@@ -73,7 +96,8 @@ class InterplatedMotion(object):
         ev_list = []
         mesh_list = []
         seed_jnt_values = None
-        for pos, rotmat in pose_list:
+        for i, pose in enumerate(pose_list):
+            pos, rotmat = pose
             jnt_values = self.robot.ik(pos, rotmat, seed_jnt_values=seed_jnt_values)
             if jnt_values is None:
                 if toggle_dbg:
@@ -113,6 +137,7 @@ class InterplatedMotion(object):
                                            end_jnt_values,
                                            obstacle_list=None,
                                            granularity=0.03,
+                                           keep_state=True,  # for decorator
                                            ee_values=None):
         interpolated_jnt_values = rm.interpolate_vectors(start_vector=start_jnt_values,
                                                          end_vector=end_jnt_values,
@@ -193,6 +218,7 @@ class InterplatedMotion(object):
             raise ValueError("Type must be sink or source!")
 
     @keep_states_decorator
+    @keep_eecd_decorator
     def gen_rel_linear_motion_with_given_conf(self,
                                               goal_jnt_values,
                                               direction=None,

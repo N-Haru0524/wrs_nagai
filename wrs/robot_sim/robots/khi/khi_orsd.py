@@ -27,7 +27,7 @@ class KHI_ORSD(sari.SglArmRobotInterface):
         # ee
         elb = self.cc.add_cce(self.end_effector.jlc.anchor.lnk_list[0])
         # manipulator
-        mlb = self.cc.add_cce(self.manipulator.jlc.anchor.lnk_list[0])
+        mlb = self.cc.add_cce(self.manipulator.jlc.anchor.lnk_list[0], toggle_ext_collider=False)
         ml0 = self.cc.add_cce(self.manipulator.jlc.jnts[0].lnk)
         ml1 = self.cc.add_cce(self.manipulator.jlc.jnts[1].lnk)
         ml2 = self.cc.add_cce(self.manipulator.jlc.jnts[2].lnk)
@@ -37,7 +37,8 @@ class KHI_ORSD(sari.SglArmRobotInterface):
         from_list = [elb, ml3, ml4, ml5]
         into_list = [mlb, ml0]
         self.cc.set_cdpair_by_ids(from_list, into_list)
-        # TODO oiee?
+        self.cc.dynamic_into_list = [mlb, ml0, ml1, ml2, ml3]
+        self.cc.dynamic_ext_list = []
 
     def fix_to(self, pos, rotmat):
         self._pos = pos
