@@ -2,10 +2,11 @@ from wrs import wd, rm, rrtc, mcm, mgm, gg, ppp, rrtc
 import wrs.robot_sim.robots.khi.khi_main as khi_dual
 import wrs.modeling.constant as const
 import nagai as khi
+from nagai import worklist as wl
 import os
 import pickle
 
-meshname = "bracketR1.stl"
+meshname = "workbench.stl"
 meshpath = os.path.join(khi.__path__[0], "meshes")
 savepath = os.path.join(khi.__path__[0], "pickles")
 
@@ -14,48 +15,34 @@ mgm.gen_frame().attach_to(base)
 home_pos = rm.np.array([-0.09,0,0.022])
 
 # object
-workbench = mcm.CollisionModel(os.path.join(meshpath,"workbench.stl") ,rgb=rm.const.orange_red, cdmesh_type=const.CDMeshType.DEFAULT)
-workbench.pos = rm.np.array([-.2, 0, .125])
-workbench.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
-workbench.attach_to(base)
+worklist_s = wl.WORK_LIST()
+worklist_s.init_pos(seed=1)
+worklist_s.init_rotmat(seed=0)
 
-bracketR1 = mcm.CollisionModel(os.path.join(meshpath,"bracketR1.stl") ,rgb=rm.const.gray, cdprim_type=const.CDPrimType.AABB)
-bracketR1.pos = rm.np.array([0, .2, .4])
-bracketR1.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
+worklist_g = wl.WORK_LIST(pos=rm.np.array([0, 0, .12]), model_type='geometricmodel')
 
-
-# object holder goal
-bracketR1_gl = mcm.CollisionModel(os.path.join(meshpath,"bracketR1.stl") ,alpha=.3)
-bracketR1_gl.pos = workbench.pos + home_pos #+ rm.np.array([0.03,.02,-0.02])
-bracketR1_gl.rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz')
-
-# copy to view original object
-cpy_start = bracketR1.copy()
-cpy_start.attach_to(base)
-cpy_goal = bracketR1_gl.copy()
-cpy_goal.attach_to(base)
+worklist_s.attach_to(base)
+worklist_g.attach_to(base)
 
 #robot
 robot = khi_dual.KHI_DUAL(pos=rm.np.array([-.59, 0, -.74]))
 robot.use_lft()
 
-print(robot.pos)
+# robot.gen_meshmodel().attach_to(base)
+# base.run()
 
 rrtc = rrtc.RRTConnect(robot)
 ppp = ppp.PickPlacePlanner(robot)
-
-# robot.gen_meshmodel().attach_to(base)
-# base.run()
 
 grasp_collection = gg.GraspCollection.load_from_disk(file_name=os.path.join(savepath, meshname.split(".")[0] + ".pickle"))
 start_conf = robot.get_jnt_values()
 print(grasp_collection)
 
-mot_data = ppp.gen_pick_and_place(obj_cmodel=bracketR1,
+mot_data = ppp.gen_pick_and_place(obj_cmodel=worklist_s.workbench,
                                   grasp_collection=grasp_collection,
                                   end_jnt_values=start_conf,
-                                  goal_pose_list=[(bracketR1_gl.pos, bracketR1_gl.rotmat)],
-                                  obstacle_list=[workbench])
+                                  goal_pose_list=[(worklist_g.bracketR1.pos, worklist_g.bracketR1.rotmat)],
+                                  obstacle_list=[])
                                 # obstacle_list=[mcm.gen_box(xyz_lengths=[.1,.01,.25], pos=rm.vec(-.2,0,.13))])
 
 if mot_data is None:
@@ -83,7 +70,7 @@ class Data(object):
 anime_data = Data(mot_data)
 
 # check collision between robot and workbench
-print("robot collided workbench?",robot.is_collided([workbench]))
+print("robot collided workbench?",robot.is_collided([worklist_s.workbench]))
 
 # anime_data.mot_data.mesh_list[56].attach_to(base)
 # base.run()
