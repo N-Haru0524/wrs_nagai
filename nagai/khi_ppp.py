@@ -1,4 +1,4 @@
-from wrs import wd, rm, rrtc, mcm, mgm, gg, ppp, rrtc
+from wrs import wd, rm, rrtc, mgm, gg, ppp, rrtc
 import wrs.robot_sim.robots.khi.khi_main as khi_dual
 import wrs.modeling.constant as const
 import nagai as khi
@@ -6,20 +6,20 @@ from nagai import worklist as wl
 import os
 import pickle
 
-meshname = "workbench.stl"
+meshname = "bracketR1.stl"
 meshpath = os.path.join(khi.__path__[0], "meshes")
 savepath = os.path.join(khi.__path__[0], "pickles")
 
 base = wd.World(cam_pos=[5, 4, 5], lookat_pos=[.0, 0, .5])
 mgm.gen_frame().attach_to(base)
-home_pos = rm.np.array([-0.09,0,0.022])
 
 # object
-worklist_s = wl.WORK_LIST()
+worklist_s = wl.WORK_LIST(rotmat=rm.np.eye(3))
+
 worklist_s.init_pos(seed=1)
 worklist_s.init_rotmat(seed=0)
 
-worklist_g = wl.WORK_LIST(pos=rm.np.array([0, 0, .12]), model_type='geometricmodel')
+worklist_g = wl.WORK_LIST(pos=rm.np.array([0, 0, .12]), alpha=.5)
 
 worklist_s.attach_to(base)
 worklist_g.attach_to(base)
@@ -38,12 +38,11 @@ grasp_collection = gg.GraspCollection.load_from_disk(file_name=os.path.join(save
 start_conf = robot.get_jnt_values()
 print(grasp_collection)
 
-mot_data = ppp.gen_pick_and_place(obj_cmodel=worklist_s.workbench,
+mot_data = ppp.gen_pick_and_place(obj_cmodel=worklist_s.bracketR1,
                                   grasp_collection=grasp_collection,
                                   end_jnt_values=start_conf,
                                   goal_pose_list=[(worklist_g.bracketR1.pos, worklist_g.bracketR1.rotmat)],
-                                  obstacle_list=[])
-                                # obstacle_list=[mcm.gen_box(xyz_lengths=[.1,.01,.25], pos=rm.vec(-.2,0,.13))])
+                                  obstacle_list=[],)
 
 if mot_data is None:
     raise ValueError("mot_data is None. Failed to generate pick and place motion data.")

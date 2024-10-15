@@ -244,6 +244,22 @@ class KHI_DUAL(ri.RobotInterface):
             return self.rgt_arm.fk(jnt_values=jnt_values)
         else:
             raise ValueError("Please specify which arm to fk")
+        
+    def toggle_off_eecd(self):
+        if self.delegator is self.lft_arm:
+            return self.lft_arm.toggle_off_eecd()
+        elif self.delegator is self.rgt_arm:
+            return self.rgt_arm.toggle_off_eecd()
+        else:
+            raise ValueError("Please specify which arm to fk")
+        
+    def toggle_on_eecd(self):
+        if self.delegator is self.lft_arm:
+            return self.lft_arm.toggle_on_eecd()
+        elif self.delegator is self.rgt_arm:
+            return self.rgt_arm.toggle_on_eecd()
+        else:
+            raise ValueError("Please specify which arm to fk")
     
 if __name__ == '__main__':
     import time

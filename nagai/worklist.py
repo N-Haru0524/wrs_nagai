@@ -10,6 +10,7 @@ class WORK_LIST():
                  rotmat = rm.rotmat_from_euler(ai=rm.np.pi/2,aj=0,ak=0,order='rxyz'),
                  yamlpath = khi.__path__[0],
                  meshpath=khi.__path__[0],
+                 alpha=1,
                  cdprim_type=const.CDPrimType.AABB,
                  cdmesh_type=const.CDMeshType.DEFAULT,
                  model_type='collisionmodel'):
@@ -17,7 +18,7 @@ class WORK_LIST():
             objects = yaml.safe_load(f)
         # workbench
         workbench_file = os.path.join(meshpath, "meshes", objects['object1']['name'] + ".stl")
-        self.workbench = mgm.GeometricModel(initor=workbench_file,rgb=rm.const.orange_red)
+        self.workbench = mgm.GeometricModel(initor=workbench_file,rgb=rm.const.orange_red, alpha=alpha)
         if model_type == 'collisionmodel':
             self.workbench = mcm.CollisionModel(initor=self.workbench, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.workbench.pos = rm.np.array(objects['object1']['pos']) + pos
@@ -28,7 +29,7 @@ class WORK_LIST():
 
         # bracketR1
         bracketR1_file = os.path.join(meshpath, "meshes", objects['object2']['name'] + ".stl")
-        self.bracketR1 = mgm.GeometricModel(initor=bracketR1_file,rgb=rm.const.gray)
+        self.bracketR1 = mgm.GeometricModel(initor=bracketR1_file,rgb=rm.const.gray, alpha=alpha)
         if model_type == 'collisionmodel':
             self.bracketR1 = mcm.CollisionModel(initor=self.bracketR1, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.bracketR1.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object2']['pos'])) + pos_o2h
@@ -36,7 +37,7 @@ class WORK_LIST():
 
         # capacitor
         capacitor_file = os.path.join(meshpath, "meshes", objects['object3']['name'] + ".stl")
-        self.capacitor = mgm.GeometricModel(initor=capacitor_file,rgb=rm.const.blue)
+        self.capacitor = mgm.GeometricModel(initor=capacitor_file,rgb=rm.const.blue, alpha=alpha)
         if model_type == 'collisionmodel':
             self.capacitor = mcm.CollisionModel(initor=self.capacitor, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.capacitor.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object3']['pos'])) + pos_o2h
@@ -44,7 +45,7 @@ class WORK_LIST():
 
         # relay_205B
         relay_205B_file = os.path.join(meshpath, "meshes", objects['object4']['name'] + ".stl")
-        self.relay_205B = mgm.GeometricModel(initor=relay_205B_file,rgb=rm.const.black)
+        self.relay_205B = mgm.GeometricModel(initor=relay_205B_file,rgb=rm.const.black, alpha=alpha)
         if model_type == 'collisionmodel':
             self.relay_205B = mcm.CollisionModel(initor=self.relay_205B, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.relay_205B.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object4']['pos'])) + pos_o2h
@@ -52,7 +53,7 @@ class WORK_LIST():
 
         # belt
         belt_file = os.path.join(meshpath, "meshes", objects['object5']['name'] + ".stl")
-        self.belt = mgm.GeometricModel(initor=belt_file,rgb=rm.const.deep_sky_blue)
+        self.belt = mgm.GeometricModel(initor=belt_file,rgb=rm.const.deep_sky_blue, alpha=alpha)
         if model_type == 'collisionmodel':
             self.belt = mcm.CollisionModel(initor=self.belt, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.belt.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object5']['pos'])) + pos_o2h
@@ -60,7 +61,7 @@ class WORK_LIST():
 
         # terminal_block
         terminal_block_file = os.path.join(meshpath, "meshes", objects['object6']['name'] + ".stl")
-        self.terminal_block = mgm.GeometricModel(initor=terminal_block_file,rgb=rm.const.yellow)
+        self.terminal_block = mgm.GeometricModel(initor=terminal_block_file,rgb=rm.const.yellow, alpha=alpha)
         if model_type == 'collisionmodel':
             self.terminal_block = mcm.CollisionModel(initor=self.terminal_block, cdprim_type=cdprim_type, cdmesh_type=cdmesh_type)
         self.terminal_block.pos = rm.np.dot(rot_o2h, rm.np.array(objects['object6']['pos'])) + pos_o2h
@@ -77,12 +78,12 @@ class WORK_LIST():
 
     def init_rotmat(self, seed=0):
         rm.np.random.seed(seed)
-        self.workbench.rotmat = rm.np.random.rand(3,3)
-        self.bracketR1.rotmat = rm.np.random.rand(3,3)
-        self.capacitor.rotmat = rm.np.random.rand(3,3)
-        self.relay_205B.rotmat = rm.np.random.rand(3,3)
-        self.belt.rotmat = rm.np.random.rand(3,3)
-        self.terminal_block.rotmat = rm.np.random.rand(3,3)
+        self.workbench.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
+        self.bracketR1.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
+        self.capacitor.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
+        self.relay_205B.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
+        self.belt.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
+        self.terminal_block.rotmat = rm.rotmat_from_axangle(rm.np.random.rand(3), rm.np.random.rand())
 
     def attach_to(self, base):
         self.workbench.attach_to(base)
@@ -91,6 +92,14 @@ class WORK_LIST():
         self.relay_205B.attach_to(base)
         self.belt.attach_to(base)
         self.terminal_block.attach_to(base)
+
+    def show_local_frame(self):
+        mgm.gen_frame(pos=self.workbench.pos, rotmat=self.workbench.rotmat).attach_to(base)
+        mgm.gen_frame(pos=self.bracketR1.pos, rotmat=self.bracketR1.rotmat).attach_to(base)
+        mgm.gen_frame(pos=self.capacitor.pos, rotmat=self.capacitor.rotmat).attach_to(base)
+        mgm.gen_frame(pos=self.relay_205B.pos, rotmat=self.relay_205B.rotmat).attach_to(base)
+        mgm.gen_frame(pos=self.belt.pos, rotmat=self.belt.rotmat).attach_to(base)
+        mgm.gen_frame(pos=self.terminal_block.pos, rotmat=self.terminal_block.rotmat).attach_to(base)
 
 if __name__ == '__main__':
     import wrs.modeling.constant as const
@@ -104,6 +113,13 @@ if __name__ == '__main__':
 
     worklist = WORK_LIST(pos=rm.np.array([0, 0, .12]))
     worklist.attach_to(base)
+    worklist.show_local_frame()
+
+    wl2 = WORK_LIST(pos=rm.np.array([0, 0, .12]))
+    wl2.init_pos(seed=1)
+    wl2.init_rotmat(seed=0)
+    wl2.attach_to(base)
+    wl2.show_local_frame()
 
     ground = mcm.CollisionModel(initor=os.path.join(khi.__path__[0], "meshes", "base_table" + ".stl"), rgb=rm.const.blue)
     ground.pos = rm.np.array([-.59, 0, -.74])
