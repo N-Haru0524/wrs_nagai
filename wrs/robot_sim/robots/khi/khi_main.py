@@ -28,8 +28,7 @@ class KHI_DUAL(ri.RobotInterface):
         self.lft_arm.fk(jnt_values=lft_arm_homeconf)
         # rgt
         self.rgt_arm = ksd.KHI_ORSD(pos=self.body.gl_flange_pose_list[1][0],
-                                    rotmat=self.body.gl_flange_pose_list[1][1],
-                                    enable_cc=False)
+                                    rotmat=self.body.gl_flange_pose_list[1][1], enable_cc=False)
         self.rgt_arm.fk(jnt_values=rgt_arm_homeconf)
         # collision detection
         if self.cc is not None:

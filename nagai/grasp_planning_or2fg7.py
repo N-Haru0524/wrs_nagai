@@ -5,7 +5,7 @@ import os
 
 base = wd.World(cam_pos=rm.np.array([.5, .5, .5]), lookat_pos=rm.np.array([0, 0, 0]))
 # mgm.gen_frame().attach_to(base)
-meshname = "terminal_block.stl"
+meshname = "bracketR1.stl"
 meshpath = os.path.join(khi.__path__[0], "meshes")
 savepath = os.path.join(khi.__path__[0], "pickles")
 
@@ -19,7 +19,7 @@ grasp_collection = gpa.plan_gripper_grasps(gripper,
                                            obj_cmodel,
                                            angle_between_contact_normals=rm.np.radians(180),
                                            rotation_interval=rm.np.radians(30),
-                                           max_samples=15,
+                                           max_samples=100,
                                            min_dist_between_sampled_contact_points=.001,
                                            contact_offset=.001,
                                            toggle_dbg=False)
